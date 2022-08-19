@@ -35,11 +35,7 @@ defmodule Conduit.Plug.Builder do
 
     quote do
       @behaviour Conduit.Plug
-      import Conduit.Message
-      import Conduit.Plug.MessageActions
-      import Conduit.Plug.Builder, only: [plug: 1, plug: 2]
-      alias Conduit.Message
-
+      
       def init(opts) do
         opts
       end
@@ -48,8 +44,14 @@ defmodule Conduit.Plug.Builder do
         next.(message)
       end
 
-      defoverridable init: 1, call: 3
+      defoverridable Conduit.Plug
 
+      import Conduit.Message
+      import Conduit.Plug.MessageActions
+      import Conduit.Plug.Builder, only: [plug: 1, plug: 2]
+      alias Conduit.Message
+
+      Module.register_attribute(__MODULE__, :plugs, accumulate: true)
       @before_compile Conduit.Plug.Builder
     end
   end
@@ -57,12 +59,12 @@ defmodule Conduit.Plug.Builder do
   @doc false
   defmacro __before_compile__(env) do
     plugs = [{:call, quote(do: opts)} | Module.get_attribute(env.module, :plugs)]
+    IO.inspect(plugs, label: :debuging_plugs)
     pipeline = compile(plugs, quote(do: next))
 
     quote do
       def run(message, opts \\ []) do
         opts = init(opts)
-
         __build__(& &1, opts).(message)
       end
 
@@ -107,16 +109,16 @@ defmodule Conduit.Plug.Builder do
   end
 
   defp quote_module_plug(plug, next, opts) do
-    if function_exported?(plug, :init, 1) && function_exported?(plug, :__build__, 2) do
+    #if function_exported?(plug, :init, 1) && function_exported?(plug, :__build__, 2) do
       opts = plug.init(opts)
 
       quote do
         unquote(plug).__build__(unquote(next), unquote(opts))
       end
-    else
-      raise Conduit.UnknownPlugError,
-            "Module #{inspect(plug)} does not implement init/1 and __build__/2. Make sure to use Conduit.Plug."
-    end
+    #else
+    #  raise Conduit.UnknownPlugError,
+    #        "Module #{inspect(plug)} does not implement init/1 and __build__/2. Make sure to use Conduit.Plug."
+    #end
   end
 
   defp quote_fun_plug(plug, next, opts) do
