@@ -8,7 +8,7 @@ defmodule Conduit.Mixfile do
     [
       app: :conduit,
       version: "0.12.10",
-      elixir: "~> 1.3",
+      elixir: "~> 1.13",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -53,11 +53,11 @@ defmodule Conduit.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:elixir_uuid, "~> 1.1"},
-      {:timex, "~> 3.0"},
-      {:jason, "~> 1.0"},
+      {:elixir_uuid, "~> 1.2"},
+      {:timex, "~> 3.7"},
+      {:jason, "~> 1.3"},
       {:ex_doc, "~> 0.24.2", only: [:dev]},
-      {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.2", only: [:dev], runtime: false},
       {:junit_formatter, "~> 3.3", only: :test},
       {:excoveralls, "~> 0.14.1", only: :test},
       {:credo, "~> 1.5", only: [:dev, :test]},
